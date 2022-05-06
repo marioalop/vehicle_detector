@@ -34,6 +34,7 @@ class KafkaConnector:
     def receive_message(self):
         for message in self._consumer:
             data = message.value
+            data = {k.lower(): v for k,v in data.items()}
             vehicle = Vehicle(**data)
             vehicle.save()
             if vehicle.category == SUSPICIOUS_VEHICLE:
@@ -43,5 +44,5 @@ class KafkaConnector:
 if __name__ == '__main__':
     while True:
         time.sleep(1)
-    #conn = KafkaConnector(DETECTIONS_TOPIC)
-    #conn.receive_message()
+    conn = KafkaConnector(DETECTIONS_TOPIC)
+    conn.receive_message()

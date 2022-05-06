@@ -9,11 +9,11 @@ connect(host=os.getenv('MONGODB_URL'))
 
 
 class Vehicle(Document):
-    year: IntField()
-    make: StringField()
-    model: StringField()
-    category: StringField()
-    created: DateTimeField(blank=True, null=True)
+    year = IntField()
+    make = StringField()
+    model = StringField()
+    category = StringField()
+    created = DateTimeField(blank=True, null=True)
     
     def save(self, *args, **kwargs):
         if not self.created:
