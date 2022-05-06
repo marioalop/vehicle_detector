@@ -5,7 +5,7 @@ services:
     image: 'bitnami/mongodb:latest'
     restart: always
     environment:
-      MONGODB_ROOT_PASSWORD: rootpasswd
+      ALLOW_EMPTY_PASSWORD: yes
       MONGODB_DATABASE: intellisite
 
   indexer:
@@ -15,7 +15,7 @@ services:
       DETECTIONS_TOPIC: intellisite.detections
       ALERTS_TOPIC: intellisite.alerts
       SUSPICIOUS_VEHICLE: SUV
-      MONGODB_URL: mongodb://root:rootpasswd@mongo:27017/intellisite
+      MONGODB_URL: mongodb://mongo:27017/intellisite
     
   fastapi:
     build: ../api
@@ -27,7 +27,7 @@ services:
       DETECTIONS_TOPIC: intellisite.detections
       ALERTS_TOPIC: intellisite.alerts
       SUSPICIOUS_VEHICLE: SUV
-      MONGODB_URL: mongodb://root:rootpasswd@mongo:27017/intellisite
+      MONGODB_URL: mongodb://mongo:27017/intellisite
 
 networks:
   default:
