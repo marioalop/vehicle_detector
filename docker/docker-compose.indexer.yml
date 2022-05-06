@@ -5,7 +5,7 @@ services:
     image: 'bitnami/mongodb:latest'
     restart: always
     environment:
-      ALLOW_EMPTY_PASSWORD: yes
+      ALLOW_EMPTY_PASSWORD: 'yes'
       MONGODB_DATABASE: intellisite
 
   indexer:
