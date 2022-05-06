@@ -6,7 +6,7 @@ services:
     environment:
       KAFKA_BROKER_URL: broker:9092
       DETECTIONS_TOPIC: intellisite.detections
-      DETECTIONS_PER_SECOND: 3
+      DETECTIONS_PER_SECOND: 1
 
 networks:
   default:

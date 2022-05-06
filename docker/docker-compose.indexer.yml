@@ -1,6 +1,13 @@
 version: "3.7"
 
 services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: passwd
+
   indexer:
     build: ../indexer
     environment:
@@ -8,6 +15,7 @@ services:
       DETECTIONS_TOPIC: intellisite.detections
       ALERTS_TOPIC: intellisite.alerts
       SUSPICIOUS_VEHICLE: SUV
+      MONGODB_URL: mongodb://admin:passwd@mongo:27017/intellisite
 
 networks:
   default:
