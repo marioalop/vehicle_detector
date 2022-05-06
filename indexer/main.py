@@ -2,7 +2,7 @@ from kafka import KafkaConsumer, KafkaProducer
 import os
 import json
 from schemas import Vehicle
-
+import time
 
 KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
 DETECTIONS_TOPIC = os.environ.get("DETECTIONS_TOPIC")
@@ -41,5 +41,7 @@ class KafkaConnector:
 
 
 if __name__ == '__main__':
-    conn = KafkaConnector(DETECTIONS_TOPIC)
-    conn.receive_message()
+    while True:
+        time.sleep(1)
+    #conn = KafkaConnector(DETECTIONS_TOPIC)
+    #conn.receive_message()

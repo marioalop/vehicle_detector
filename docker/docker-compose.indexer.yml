@@ -16,6 +16,18 @@ services:
       ALERTS_TOPIC: intellisite.alerts
       SUSPICIOUS_VEHICLE: SUV
       MONGODB_URL: mongodb://admin:passwd@mongo:27017/intellisite
+    
+    fastapi:
+      build: ../api
+      restart: always
+      ports:
+        - "80:8000"
+      environment:
+        KAFKA_BROKER_URL: broker:9092
+        DETECTIONS_TOPIC: intellisite.detections
+        ALERTS_TOPIC: intellisite.alerts
+        SUSPICIOUS_VEHICLE: SUV
+        MONGODB_URL: mongodb://admin:passwd@mongo:27017/intellisite
 
 networks:
   default:
