@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  indexer:
+    build: ../indexer
+    environment:
+      KAFKA_BROKER_URL: broker:9092
+      DETECTIONS_TOPIC: intellisite.detections
+      ALERTS_TOPIC: intellisite.alerts
+      SUSPICIOUS_VEHICLE: SUV
+
+networks:
+  default:
+   external:
+     name: intellisite

@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  producer:
+    build: ../producer
+    environment:
+      KAFKA_BROKER_URL: broker:9092
+      DETECTIONS_TOPIC: intellisite.detections
+      DETECTIONS_PER_SECOND: 3
+
+networks:
+  default:
+   external:
+     name: intellisite

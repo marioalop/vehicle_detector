@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: "broker:9092"
+
+networks:
+  default:
+   external:
+     name: intellisite
