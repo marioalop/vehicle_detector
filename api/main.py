@@ -131,7 +131,7 @@ async def stats(Authorize: AuthJWT = Depends()):
 
 @app.get('/alerts')
 async def message_stream(request: Request, Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
+    #Authorize.jwt_required()
     async def consume():
         consumer = AIOKafkaConsumer(ALERTS_TOPIC, bootstrap_servers=KAFKA_BROKER_URL)
         await consumer.start()
