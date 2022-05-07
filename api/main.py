@@ -50,9 +50,6 @@ async def login(login_form: User, Authorize: AuthJWT = Depends()):
     if not user:
         raise HTTPException(status_code=401,detail="Bad username or password")
 
-    if user.is_active is False:
-        raise HTTPException(status_code=401, detail='User is not active')
-    
     # subject identifier for who this token is for example id or username from database
     access_token = Authorize.create_access_token(subject=user.username, user_claims={"id": str(user.id)}, fresh=True)
     refresh_token = Authorize.create_refresh_token(subject=user.username, user_claims={"id": str(user.id)})
@@ -68,7 +65,7 @@ def refresh(Authorize: AuthJWT = Depends()):
     return {"access_token": new_access_token, "expire": JWT_EXPIRE}
 
 
-@app.get('/users/create-superuser', response_description="Create superuser", response_model=User)
+@app.get('/users/create-superuser', response_description="Create superuser")
 async def create_superuser():
     u = await User.get(username="admin")
     if not u:
@@ -86,7 +83,7 @@ async def create_user(user: User, Authorize: AuthJWT = Depends()):
         return u
     raise HTTPException(status_code=401, detail=f"User {user.username} already exists.")
 
-@app.post('/get', response_description="List detections", response_model=List[Vehicle])
+@app.get('/detections', response_description="List detections", response_model=List[Vehicle])
 async def detections(request: Request, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     sort_opt = {
@@ -107,11 +104,13 @@ async def detections(request: Request, Authorize: AuthJWT = Depends()):
         "__lt=": "<",
         "__lte=": "<="
     }
+    params = str(request.query_params)
     for op in ops:
         params = params.replace(op, ops[op])
     params = str(request.query_params)
     params = mqm(string_query=params)
-    sort = sort_opt[params.pop("sort")]
+    sort = params.pop("sort", '-created')
+    sort = sort_opt['-created']  if sort is None else sort_opt[sort]
     data = await Vehicle.raw_query(params["filter"], sort, params["skip"], params["limit"])
     return data
 
