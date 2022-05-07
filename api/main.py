@@ -20,6 +20,8 @@ JWT_EXPIRE = timedelta(3600)
 JWT_SECRET =  '45c86f7ab8044d499f6b8f632167f33f'
 KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
 ALERTS_TOPIC = os.environ.get("ALERTS_TOPIC")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 class Settings(BaseModel):
     authjwt_secret_key: str = JWT_SECRET
@@ -72,9 +74,9 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 @app.get('/users/create-superuser', response_description="Create superuser")
 async def create_superuser():
-    u = await User.get(username="admin")
+    u = await User.get(username=ADMIN_USERNAME)
     if not u:
-        u = User(username = 'admin', password = 'Intellisite##789')
+        u = User(username = ADMIN_USERNAME, password = ADMIN_PASSWORD)
         await u.save()    
     return {}
 

@@ -28,6 +28,8 @@ services:
       ALERTS_TOPIC: intellisite.alerts
       SUSPICIOUS_VEHICLE: SUV
       MONGODB_URL: mongodb://mongo:27017/intellisite
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: adminpasswd
 
 networks:
   default:
