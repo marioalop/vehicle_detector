@@ -42,7 +42,5 @@ class KafkaConnector:
 
 
 if __name__ == '__main__':
-    while True:
-        time.sleep(1)
     conn = KafkaConnector(DETECTIONS_TOPIC)
     conn.receive_message()
