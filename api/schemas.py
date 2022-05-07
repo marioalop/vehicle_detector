@@ -93,5 +93,5 @@ class Vehicle(Model):
         return documents
     
     @classmethod
-    async def count(cls):
-        return await engine.count(Vehicle)
+    async def count(cls, q):
+        return await engine.count(Vehicle, q)

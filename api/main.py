@@ -10,7 +10,7 @@ from mqmfork import mqmfork as mqm
 from pydantic import BaseModel
 from datetime import timedelta
 from schemas import User, Vehicle
-from typing import List
+from typing import List, Dict
 import asyncio
 from aiokafka import AIOKafkaConsumer
 import json
@@ -90,7 +90,7 @@ async def create_user(user: User, Authorize: AuthJWT = Depends()):
     raise HTTPException(status_code=401, detail=f"User {user.username} already exists.")
 
 
-@app.get('/detections', response_description="List detections", response_model=List[Vehicle])
+@app.get('/detections', response_description="List detections")
 async def detections(request: Request, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     sort_opt = {
@@ -114,13 +114,12 @@ async def detections(request: Request, Authorize: AuthJWT = Depends()):
     params = str(request.query_params)
     for op in ops:
         params = params.replace(op, ops[op])
-    params = str(request.query_params)
     params = mqm(string_query=params)
     params['limit'] = 100 if params['limit'] == 0 else params['limit']
     sort = params.pop("sort", '-created')
     sort = sort_opt['-created']  if sort is None else sort_opt[sort]
     data = await Vehicle.raw_query(params["filter"], sort, params["skip"], params["limit"])
-    return {"skip": params["skip"], "limit": params["limit"], "total": await Vehicle.count(), "data": data}
+    return {"skip": params["skip"], "limit": params["limit"], "total": await Vehicle.count(params["filter"]), "data": data}
 
 
 @app.get("/stats", response_description="Vehicle counting per Make")
