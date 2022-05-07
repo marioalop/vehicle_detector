@@ -82,3 +82,12 @@ class Vehicle(Model):
     async def raw_query(cls, mongodb_query: dict, sort: Any, skip: int = 0, limit: int = None) -> List:
         result = await engine.find(Vehicle, mongodb_query, sort=sort, skip=skip, limit=limit)
         return result
+
+    @classmethod
+    async def count_per(cls, group):
+        pipelines = [
+            {"$group" : {"_id": f"${group}", "count":{"$sum":1}}}
+        ]
+        collection = engine.get_collection(Vehicle)
+        documents = await collection.aggregate(pipelines).to_list(length=None)
+        return documents

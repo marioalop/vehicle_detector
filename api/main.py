@@ -5,15 +5,21 @@ from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from sse_starlette.sse import EventSourceResponse
 from mqmfork import mqmfork as mqm
 from pydantic import BaseModel
 from datetime import timedelta
 from schemas import User, Vehicle
 from typing import List
+import asyncio
+from kafka import KafkaConsumer, KafkaProducer
+import json
 
 
 JWT_EXPIRE = timedelta(3600)
 JWT_SECRET =  '45c86f7ab8044d499f6b8f632167f33f'
+KAFKA_BROKER_URL = os.environ.get("KAFKA_BROKER_URL")
+ALERTS_TOPIC = os.environ.get("ALERTS_TOPIC")
 
 
 class Settings(BaseModel):
@@ -73,6 +79,7 @@ async def create_superuser():
         await u.save()    
     return {}
 
+
 @app.post('/users', response_description="Create user", response_model=User)
 async def create_user(user: User, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
@@ -82,6 +89,7 @@ async def create_user(user: User, Authorize: AuthJWT = Depends()):
         await u.save()    
         return u
     raise HTTPException(status_code=401, detail=f"User {user.username} already exists.")
+
 
 @app.get('/detections', response_description="List detections", response_model=List[Vehicle])
 async def detections(request: Request, Authorize: AuthJWT = Depends()):
@@ -109,8 +117,39 @@ async def detections(request: Request, Authorize: AuthJWT = Depends()):
         params = params.replace(op, ops[op])
     params = str(request.query_params)
     params = mqm(string_query=params)
+    params['limit'] = None if params['limit'] == 0 else params['limit']
     sort = params.pop("sort", '-created')
     sort = sort_opt['-created']  if sort is None else sort_opt[sort]
     data = await Vehicle.raw_query(params["filter"], sort, params["skip"], params["limit"])
     return data
 
+
+@app.get("/stats", response_description="Vehicle counting per Make")
+async def stats(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    data = await Vehicle.count_per("make")
+    return data
+
+
+@app.get('/alerts')
+async def message_stream(request: Request, Authorize: AuthJWT = Depends()):
+    def new_messages():
+        Authorize.jwt_required()
+        consumer = KafkaConsumer(ALERTS_TOPIC,
+                                       bootstrap_servers=KAFKA_BROKER_URL,
+                                       value_deserializer=lambda x: json.loads(x.decode())
+                                       )
+        for msg in consumer:
+            data = msg.value
+            data = {k.lower(): v for k,v in data.items()}
+            yield data
+
+    async def event_generator():
+        while True:
+            # If client closes connection, stop sending events
+            if await request.is_disconnected():
+                break
+            yield new_messages()
+            await asyncio.sleep(1)
+
+    return EventSourceResponse(event_generator())
