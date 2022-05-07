@@ -6,5 +6,4 @@ passlib==1.7.4
 mongo-queries-manager==0.2.2
 anyio==3.5.0
 sse-starlette==0.10.3
-kafka-python==2.0.2
-
+aiokafka==0.7.2

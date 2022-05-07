@@ -91,3 +91,7 @@ class Vehicle(Model):
         collection = engine.get_collection(Vehicle)
         documents = await collection.aggregate(pipelines).to_list(length=None)
         return documents
+    
+    @classmethod
+    async def count(cls):
+        return await engine.count(Vehicle)

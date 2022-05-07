@@ -18,7 +18,6 @@ class KafkaConnector:
                                        )
         self.producer = KafkaProducer(
                             bootstrap_servers=KAFKA_BROKER_URL,
-                            # Encode all values as JSON
                             value_serializer=lambda value: json.dumps(value).encode(),
                         )
     
